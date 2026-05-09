@@ -1,0 +1,19 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
+export const ENV = {
+  PORT: Number(process.env.PORT),
+  NODE_ENV: process.env.NODE_ENV || "development",
+  DB_User: process.env.DB_USER as string,
+  DB_PASSWORD: process.env.DB_PASSWORD as string,
+  DB_SERVER: process.env.DB_SERVER as string,
+  DB_NAME: process.env.DB_NAME as string,
+  DB_PORT: parseInt(process.env.DB_PORT || "1433"),
+  API_KEY: process.env.API_KEY as string,
+  ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS || "",
+  LOG_LEVEL: process.env.LOG_LEVEL || "debug",
+  LOG_DIR: process.env.LOG_DIR || "",
+  LOG_MAX_DAYS: process.env.LOG_MAX_DAYS || "",
+  LOG_TO_CONSOLE: process.env.LOG_TO_CONSOLE || "",
+};

@@ -1,0 +1,379 @@
+openapi: 3.0.0
+
+info:
+  title: LCA Service API
+  version: 1.0.0
+  description: API documentation for Emission Factor Module
+
+servers:
+  - url: http://localhost:5001
+    description: Local
+
+  - url: https://serviceapi.greenesteplca.com
+    description: Production
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+
+  schemas:
+
+    # SuccessResponse:
+    #   type: object
+    #   properties:
+    #     success:
+    #       type: boolean
+    #       example: true
+
+    #     message:
+    #       type: string
+
+    #     data:
+    #       type: object
+
+    # ErrorResponse:
+    #   type: object
+    #   properties:
+    #     success:
+    #       type: boolean
+    #       example: false
+
+    #     message:
+    #       type: string
+
+    # EmissionFactorMix:
+    #   type: object
+    #   properties:
+    #     componentName:
+    #       type: string
+    #       example: CO2
+
+    #     percentage:
+    #       type: number
+    #       format: decimal
+    #       example: 70
+
+    #     sortOrder:
+    #       type: integer
+    #       example: 1
+
+    # SaveEmissionFactorRequest:
+    #   type: object
+
+    #   required:
+    #     - categoryID
+    #     - factorName
+    #     - efType
+    #     - efCO2e
+    #     - scopeLevel
+    #     - effectiveFrom
+
+    #   properties:
+
+    #     factorID:
+    #       type: integer
+    #       nullable: true
+
+    #     categoryID:
+    #       type: integer
+    #       example: 4
+
+    #     factorName:
+    #       type: string
+    #       example: Diesel Combustion
+
+    #     efType:
+    #       type: string
+    #       enum:
+    #         - ACTIVITY
+    #         - SPEND
+
+    #     efCO2:
+    #       type: number
+    #       example: 2.67
+
+    #     efCH4:
+    #       type: number
+    #       example: 0.0001
+
+    #     efN2O:
+    #       type: number
+    #       example: 0.0002
+
+    #     efCO2e:
+    #       type: number
+    #       example: 2.68
+
+    #     efUnitID:
+    #       type: integer
+    #       nullable: true
+
+    #     currencyCode:
+    #       type: string
+    #       nullable: true
+
+    #     scopeLevel:
+    #       type: string
+    #       enum:
+    #         - GLOBAL
+    #         - REGION
+    #         - COUNTRY
+    #         - STATE
+    #         - CITY
+    #         - TENANT
+
+    #     regionID:
+    #       type: integer
+    #       nullable: true
+
+    #     countryID:
+    #       type: integer
+    #       nullable: true
+
+    #     stateID:
+    #       type: integer
+    #       nullable: true
+
+    #     cityID:
+    #       type: integer
+    #       nullable: true
+
+    #     tenantID:
+    #       type: integer
+    #       nullable: true
+
+    #     sourceID:
+    #       type: integer
+    #       nullable: true
+
+    #     processID:
+    #       type: integer
+    #       nullable: true
+
+    #     industryID:
+    #       type: integer
+    #       nullable: true
+
+    #     productID:
+    #       type: integer
+    #       nullable: true
+
+    #     isCompositeFactor:
+    #       type: boolean
+    #       example: false
+
+    #     note:
+    #       type: string
+    #       nullable: true
+
+    #     effectiveFrom:
+    #       type: string
+    #       format: date
+
+    #     effectiveTo:
+    #       type: string
+    #       format: date
+    #       nullable: true
+
+    #     isActive:
+    #       type: boolean
+    #       example: true
+
+    #     mix:
+    #       type: array
+    #       items:
+    #         $ref: "#/components/schemas/EmissionFactorMix"
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+
+  /health:
+    get:
+      summary: Health Check
+      tags:
+        - System
+
+      responses:
+        "200":
+          description: OK
+
+  /api/v1/test:
+    get:
+      summary: API Connectivity Test
+      tags:
+        - Test
+
+      security:
+        - ApiKeyAuth: []
+
+      responses:
+        "200":
+          description: API working
+
+  /api/v1/ef/reference:
+    get:
+      summary: Get Emission Factor Reference Data
+      tags:
+        - Emission Factor
+
+      security:
+        - ApiKeyAuth: []
+
+      responses:
+        "200":
+          description: Reference data fetched successfully
+
+  /api/v1/ef/dashboard:
+    get:
+      summary: Get Emission Factor Dashboard
+      tags:
+        - Emission Factor
+
+      security:
+        - ApiKeyAuth: []
+
+      responses:
+        "200":
+          description: Dashboard data fetched successfully
+
+  /api/v1/ef/list:
+    get:
+      summary: Get Emission Factor List
+      tags:
+        - Emission Factor
+
+      security:
+        - ApiKeyAuth: []
+
+      parameters:
+
+        - in: query
+          name: searchText
+          schema:
+            type: string
+
+        - in: query
+          name: efType
+          schema:
+            type: string
+            enum:
+              - ACTIVITY
+              - SPEND
+
+        - in: query
+          name: scopeLevel
+          schema:
+            type: string
+
+        - in: query
+          name: isActive
+          schema:
+            type: boolean
+
+        - in: query
+          name: sourceId
+          schema:
+            type: integer
+
+        - in: query
+          name: pageNo
+          schema:
+            type: integer
+            default: 1
+
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 20
+
+      responses:
+        "200":
+          description: Emission factor list fetched successfully
+
+  /api/v1/ef/setup:
+    get:
+      summary: Get Emission Factor Setup Data
+      tags:
+        - Emission Factor
+
+      security:
+        - ApiKeyAuth: []
+
+      parameters:
+
+        - in: query
+          name: mode
+          required: true
+          schema:
+            type: string
+            enum:
+              - NEW
+              - VIEW
+              - EDIT
+              - CLONE
+              - VERSION
+
+        - in: query
+          name: id
+          required: false
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: Setup data fetched successfully
+
+  /api/v1/ef/save:
+    post:
+      summary: Create or Update Emission Factor
+      tags:
+        - Emission Factor
+
+      security:
+        - ApiKeyAuth: []
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveEmissionFactorRequest"
+
+      responses:
+        "200":
+          description: Emission factor saved successfully
+
+        "400":
+          description: Validation error
+
+  /api/v1/ef/delete/{id}:
+    delete:
+      summary: Delete Emission Factor
+      tags:
+        - Emission Factor
+
+      security:
+        - ApiKeyAuth: []
+
+      parameters:
+
+        - in: path
+          name: id
+          required: true
+
+          schema:
+            type: integer
+
+      responses:
+        "200":
+          description: Emission factor deleted successfully
+
+        "400":
+          description: Invalid factor
