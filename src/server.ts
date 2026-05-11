@@ -4,7 +4,7 @@ import app from "./app";
 import { ENV } from "./config/env";
 import { connectDB } from "./config/db";
 
-const port = Number(ENV.PORT);
+const port = ENV.PORT || "5001";
 
 async function start() { 
     await connectDB();

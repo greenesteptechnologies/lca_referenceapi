@@ -3,13 +3,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const ENV = {
-  PORT: Number(process.env.PORT),
+  PORT: process.env.PORT,
   NODE_ENV: process.env.NODE_ENV || "development",
   DB_User: process.env.DB_USER as string,
   DB_PASSWORD: process.env.DB_PASSWORD as string,
   DB_SERVER: process.env.DB_SERVER as string,
   DB_NAME: process.env.DB_NAME as string,
-  DB_PORT: parseInt(process.env.DB_PORT || "1433"),
+  DB_PORT: parseInt(process.env.DB_PORT || "1433", 10),
   API_KEY: process.env.API_KEY as string,
   ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS || "",
   LOG_LEVEL: process.env.LOG_LEVEL || "debug",
