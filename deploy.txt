@@ -1,0 +1,5 @@
+-- Temp Deployment Procedure --
+
+- Run npm run build-production
+- It will generate the deploy folder
+- Move it to server and run "npm install --omit=dev" to install packages
