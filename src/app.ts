@@ -27,13 +27,26 @@ app.use(express.json());
 app.use(requestMiddleware);
 
 // CORS CONFIGURATION
+const normalizeOrigin = (origin: string) => {
+  if (origin === "*") {
+    return origin;
+  }
+
+  try {
+    return new URL(origin).origin;
+  } catch {
+    return origin.replace(/\/+$/, "");
+  }
+};
+
 const allowedOrigins = (ENV.ALLOWED_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim())
+  .map(normalizeOrigin)
   .filter(Boolean);
 
 // For dev/testing only — do not enable in production
-// const allowAllOrigins = allowedOrigins.includes("*");
+const allowAllOrigins = allowedOrigins.includes("*");
 
 app.use(
   cors({
@@ -43,7 +56,9 @@ app.use(
         return callback(null, true);
       }
 
-      if ( /* allowAllOrigins || */ allowedOrigins.includes(origin)) {
+      const requestOrigin = normalizeOrigin(origin);
+
+      if (allowAllOrigins || allowedOrigins.includes(requestOrigin)) {
         return callback(null, true);
       }
 
