@@ -21,6 +21,86 @@ components:
 
   schemas:
 
+    SaveProcessCategoryRequest:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum:
+            - INSERT
+            - UPDATE
+            - DELETE
+          example: INSERT
+        processCategoryId:
+          type: integer
+          nullable: true
+          example: 12
+        industryId:
+          type: integer
+          nullable: true
+          example: 1
+        categoryName:
+          type: string
+          nullable: true
+          example: Energy
+        description:
+          type: string
+          nullable: true
+          example: Energy related processes
+        parentCategoryId:
+          type: integer
+          nullable: true
+          example: null
+        isActive:
+          type: boolean
+          example: true
+        isProductionProcess:
+          type: boolean
+          example: false
+      description: For INSERT provide industryId and categoryName. For UPDATE provide processCategoryId, industryId and categoryName. For DELETE provide processCategoryId.
+
+    SaveProcessRequest:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum:
+            - INSERT
+            - UPDATE
+            - DELETE
+          example: INSERT
+        processId:
+          type: integer
+          nullable: true
+          example: 25
+        industryId:
+          type: integer
+          nullable: true
+          example: 1
+        processCategoryId:
+          type: integer
+          nullable: true
+          example: 12
+        processName:
+          type: string
+          nullable: true
+          example: Diesel Combustion
+        description:
+          type: string
+          nullable: true
+          example: Default diesel process
+        isMandatoryDefault:
+          type: boolean
+          example: false
+        isActive:
+          type: boolean
+          example: true
+      description: For INSERT provide industryId, processCategoryId and processName. For UPDATE provide processId, industryId, processCategoryId and processName. For DELETE provide processId.
+
     # SuccessResponse:
     #   type: object
     #   properties:
@@ -658,6 +738,128 @@ paths:
 
         "400":
           description: Invalid factor
+
+  /api/v1/process-master/Process-category:
+    get:
+      summary: Get Process Category Master List
+      tags:
+        - Process Master
+
+      security:
+        - ApiKeyAuth: []
+
+      parameters:
+
+        - in: query
+          name: industryId
+          required: false
+          schema:
+            type: integer
+          description: Optional Industry ID filter. When omitted, returns categories for all industries.
+
+        - in: query
+          name: searchText
+          required: false
+          schema:
+            type: string
+          description: Optional category name search filter.
+
+        - in: query
+          name: processCategoryId
+          required: false
+          schema:
+            type: integer
+          description: Optional specific Process Category ID filter.
+
+      responses:
+        "200":
+          description: Process category master fetched successfully
+
+  /api/v1/process-master/Process-category/save:
+    post:
+      summary: Save Process Category
+      tags:
+        - Process Master
+
+      security:
+        - ApiKeyAuth: []
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveProcessCategoryRequest"
+
+      responses:
+        "200":
+          description: Process category saved successfully
+
+        "400":
+          description: Validation error
+
+  /api/v1/process-master/Process:
+    get:
+      summary: Get Process Master List
+      tags:
+        - Process Master
+
+      security:
+        - ApiKeyAuth: []
+
+      parameters:
+
+        - in: query
+          name: industryId
+          required: false
+          schema:
+            type: integer
+
+        - in: query
+          name: processCategoryId
+          required: false
+          schema:
+            type: integer
+
+        - in: query
+          name: searchText
+          required: false
+          schema:
+            type: string
+
+        - in: query
+          name: processId
+          required: false
+          schema:
+            type: integer
+          description: Optional specific Process ID filter.
+
+      responses:
+        "200":
+          description: Process master fetched successfully
+
+  /api/v1/process-master/Process/save:
+    post:
+      summary: Save Process
+      tags:
+        - Process Master
+
+      security:
+        - ApiKeyAuth: []
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveProcessRequest"
+
+      responses:
+        "200":
+          description: Process saved successfully
+
+        "400":
+          description: Validation error
 
   /api/v1/temp/processmaster/{industryId}:
     get:

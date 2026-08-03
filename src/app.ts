@@ -11,6 +11,7 @@ import { errorHandler } from "./middlewares/error.middleware";
 
 import testRoutes from "./routes/test.routes";
 import efRoutes from "./routes/modules/ef_factor/ef.routes";
+import processMasterRoutes from "./routes/modules/process_master/process_master.routes";
 
 import { swaggerServe, swaggerSetup } from "./config/swagger";
 import tempRoutes from "./routes/scenario_analysis/temp_routes";
@@ -144,6 +145,9 @@ app.use("/api/v1/test", testRoutes);
 
 // Emission Factor Routes
 app.use("/api/v1/ef", efRoutes);
+
+// Process Master Routes
+app.use("/api/v1/process-master", processMasterRoutes);
 
 //Temp Routes
 app.use("/api/v1/temp", tempRoutes);
