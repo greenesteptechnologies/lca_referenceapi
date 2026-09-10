@@ -282,6 +282,10 @@ components:
         ScenarioName:
           type: string
           example: Scenario 1
+        ScenarioType:
+          type: string
+          example: SOCIAL_LCA
+          description: Scenario type filter/identifier. Supported values include LCT and SOCIAL_LCA.
         Description:
           type: string
           nullable: true
@@ -319,6 +323,10 @@ components:
         scenarioName:
           type: string
           example: Scenario 1
+        scenarioType:
+          type: string
+          example: SOCIAL_LCA
+          description: Optional scenario type. Defaults to LCT when omitted.
         description:
           type: string
           nullable: true
@@ -1038,6 +1046,14 @@ paths:
             type: integer
           description: User ID
 
+        - in: query
+          name: scenarioType
+          required: false
+          schema:
+            type: string
+            example: SOCIAL_LCA
+          description: Optional filter. Supported values include LCT and SOCIAL_LCA. If omitted, all active scenarios for the user are returned.
+
       responses:
         "200":
           description: Scenarios fetched successfully
@@ -1092,6 +1108,7 @@ paths:
               $ref: "#/components/schemas/CreateScenarioRequest"
             example:
               scenarioName: Scenario 1
+              scenarioType: SOCIAL_LCA
               description: Testing alternate energy usage
 
       responses:

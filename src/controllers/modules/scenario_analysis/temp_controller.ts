@@ -185,10 +185,13 @@ export const deleteMyProcess = asyncHandler(async (req: Request, res: Response) 
 });
 
 const addScenarioInputs = (request: any, body: any, tenantId: number, userId: number) => {
+  const scenarioType = String(body.scenarioType || "LCT").trim().toUpperCase();
+
   return request
     .input("TenantId", tenantId)
     .input("UserId", userId)
     .input("ScenarioName", body.scenarioName)
+    .input("ScenarioType", scenarioType)
     .input("Description", body.description || null)
     .input("Ext1", body.ext1 || null)
     .input("Ext2", body.ext2 || null)
@@ -203,6 +206,7 @@ export const createScenario = asyncHandler(async (req: Request, res: Response) =
   const tenantId = Number(user?.tenantId || req.query.tenantId);
   const userId = Number(user?.id || req.query.userId);
   const scenarioName = req.body.scenarioName?.trim();
+  const scenarioType = String(req.body.scenarioType || "LCT").trim().toUpperCase();
 
   if (!tenantId || !userId || !scenarioName) {
     return res.status(400).json({
@@ -215,7 +219,7 @@ export const createScenario = asyncHandler(async (req: Request, res: Response) =
 
   const result = await addScenarioInputs(
     pool.request(),
-    { ...req.body, scenarioName },
+    { ...req.body, scenarioName, scenarioType },
     tenantId,
     userId
   ).query(CREATE_SCENARIO);
@@ -230,6 +234,7 @@ export const getMyScenarios = asyncHandler(async (req: Request, res: Response) =
 
   const tenantId = Number(user?.tenantId || req.query.tenantId);
   const userId = Number(user?.id || req.query.userId);
+  const scenarioType = String(req.query.scenarioType || "").trim().toUpperCase();
 
   if (!tenantId || !userId) {
     return res.status(400).json({
@@ -244,6 +249,7 @@ export const getMyScenarios = asyncHandler(async (req: Request, res: Response) =
     .request()
     .input("TenantId", tenantId)
     .input("UserId", userId)
+    .input("ScenarioType", scenarioType)
     .query(GET_MY_SCENARIOS);
 
   return res.json(
@@ -298,6 +304,7 @@ export const saveScenarioProcess = asyncHandler(async (req: Request, res: Respon
   } = req.body;
   let scenarioId = Number(req.body.scenarioId);
   const scenarioName = req.body.scenarioName?.trim();
+  const scenarioType = String(req.body.scenarioType || "LCT").trim().toUpperCase();
 
   if (!tenantId || !userId || (!scenarioId && !scenarioName) || !processId) {
     return res.status(400).json({
@@ -315,7 +322,7 @@ export const saveScenarioProcess = asyncHandler(async (req: Request, res: Respon
     if (!scenarioId) {
       const scenarioResult = await addScenarioInputs(
         transaction.request(),
-        { ...req.body, scenarioName },
+        { ...req.body, scenarioName, scenarioType },
         tenantId,
         userId
       ).query(CREATE_SCENARIO);
@@ -373,6 +380,7 @@ export const saveScenarioProcessesBulk = asyncHandler(
     const userId = Number(user?.id || req.query.userId);
     let scenarioId = Number(req.body.scenarioId);
     const scenarioName = req.body.scenarioName?.trim();
+    const scenarioType = String(req.body.scenarioType || "LCT").trim().toUpperCase();
     const processes = req.body.processes;
 
     if (!tenantId || !userId || (!scenarioId && !scenarioName) || !Array.isArray(processes) || processes.length === 0) {
@@ -400,7 +408,7 @@ export const saveScenarioProcessesBulk = asyncHandler(
       if (!scenarioId) {
         const scenarioResult = await addScenarioInputs(
           transaction.request(),
-          { ...req.body, scenarioName },
+          { ...req.body, scenarioName, scenarioType },
           tenantId,
           userId
         ).query(CREATE_SCENARIO);
