@@ -96,6 +96,7 @@ INSERT INTO LCA_MyScenario
     TenantId,
     UserId,
     ScenarioName,
+    ScenarioType,
     Description,
     Ext1,
     Ext2,
@@ -110,6 +111,7 @@ OUTPUT
     INSERTED.TenantId,
     INSERTED.UserId,
     INSERTED.ScenarioName,
+    INSERTED.ScenarioType,
     INSERTED.Description,
     INSERTED.Ext1,
     INSERTED.Ext2,
@@ -123,6 +125,7 @@ VALUES
     @TenantId,
     @UserId,
     @ScenarioName,
+    @ScenarioType,
     @Description,
     @Ext1,
     @Ext2,
@@ -140,6 +143,7 @@ SELECT
     TenantId,
     UserId,
     ScenarioName,
+    ScenarioType,
     Description,
     Ext1,
     Ext2,
@@ -153,6 +157,7 @@ FROM LCA_MyScenario
 WHERE TenantId = @TenantId
   AND UserId = @UserId
   AND IsActive = 1
+  AND (@ScenarioType = '' OR ScenarioType = @ScenarioType)
 ORDER BY ModifiedOn DESC, ScenarioId DESC
 `;
 
@@ -162,6 +167,7 @@ SELECT
     TenantId,
     UserId,
     ScenarioName,
+    ScenarioType,
     Description,
     Ext1,
     Ext2,
