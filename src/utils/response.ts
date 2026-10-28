@@ -63,6 +63,10 @@ export const errorCodeMap: Record<string, ErrorMeta> = {
 	FACTOR_ALREADY_EXISTS: {
 		message: "A matching factor already exists for the selected date.",
 	},
+	FACTOR_KEY_REQUIRED_FOR_RETENTION: {
+		message: "FactorKey is required when RetainFactorKey is enabled.",
+		field: "FactorKey",
+	},
 	INVALID_FACTOR: {
 		message: "The requested factor record was not found.",
 	},
