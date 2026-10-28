@@ -227,6 +227,8 @@ export const saveEmissionFactor = asyncHandler(
     request.input("EffectiveTo", req.body.EffectiveTo ?? null);
 
     request.input("IsActive", req.body.IsActive ?? true);
+    request.input("FactorKey", sql.VarChar(300), req.body.FactorKey ?? null);
+    request.input("RetainFactorKey", sql.Bit, req.body.RetainFactorKey ?? false);
 
     // TVP
     request.input("Mix", tvp);
@@ -246,9 +248,12 @@ export const saveEmissionFactor = asyncHandler(
 
     if (response?.Success === 0) {
       const errorCode = response?.ErrorCode ?? response?.Errorcode ?? null;
-      const errorMeta = getErrorMeta(errorCode);
+      const errorMessage = response?.ErrorMessage;
+      const messageErrorMeta = getErrorMeta(errorMessage);
+      const errorMeta = getErrorMeta(errorCode) ?? messageErrorMeta;
+      const apiErrorCode = messageErrorMeta ? errorMessage : errorCode;
       const friendlyMessage =
-        errorMeta?.message || response?.ErrorMessage || "Save failed";
+        errorMeta?.message || errorMessage || "Save failed";
 
       return res
         .status(400)
@@ -256,7 +261,7 @@ export const saveEmissionFactor = asyncHandler(
           errorResponse(
             friendlyMessage,
             { result: response, auditLogs },
-            errorCode ?? undefined,
+            apiErrorCode ?? undefined,
             errorMeta?.field ?? null,
           ),
         );
