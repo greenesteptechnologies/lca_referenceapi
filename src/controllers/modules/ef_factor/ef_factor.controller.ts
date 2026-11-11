@@ -1,11 +1,40 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../../../utils/asyncHandler";
 import {
-	errorResponse,
-	getErrorMeta,
-	successResponse,
+  errorResponse,
+  getErrorMeta,
+  successResponse,
 } from "../../../utils/response";
 import sql, { getPool } from "../../../config/db";
+
+interface EmissionFactorSaveDecision {
+  IsProvisional?: boolean | null;
+  SaveDecision?: string | null;
+  MaterialID?: number | null;
+  ResolutionNote?: string | null;
+}
+
+const resolveIsProvisional = (
+  isProvisional: unknown,
+  saveDecision: unknown,
+): boolean | null => {
+  if (isProvisional !== undefined && isProvisional !== null) {
+    return typeof isProvisional === "boolean" ? isProvisional : null;
+  }
+
+  if (typeof saveDecision !== "string") {
+    return null;
+  }
+
+  switch (saveDecision.trim().toUpperCase()) {
+    case "APPROVE":
+      return false;
+    case "PROVISIONAL":
+      return true;
+    default:
+      return null;
+  }
+};
 
 export const getEmissionFactorReferenceData = asyncHandler(
   async (_req: Request, res: Response) => {
@@ -163,6 +192,33 @@ export const getEmissionFactorSetup = asyncHandler(
 
 export const saveEmissionFactor = asyncHandler(
   async (req: Request, res: Response) => {
+    const { IsProvisional, SaveDecision } =
+      req.body as EmissionFactorSaveDecision;
+    const hasIsProvisional =
+      IsProvisional !== undefined && IsProvisional !== null;
+    const hasSaveDecision = SaveDecision !== undefined && SaveDecision !== null;
+    const isSaveDecisionValid =
+      typeof SaveDecision === "string" &&
+      ["APPROVE", "PROVISIONAL"].includes(SaveDecision.trim().toUpperCase());
+
+    if (
+      (hasIsProvisional && typeof IsProvisional !== "boolean") ||
+      (!hasIsProvisional && hasSaveDecision && !isSaveDecisionValid)
+    ) {
+      return res
+        .status(400)
+        .json(
+          errorResponse(
+            "IsProvisional must be a boolean or SaveDecision must be APPROVE or PROVISIONAL",
+            null,
+            "INVALID_SAVE_DECISION",
+            "IsProvisional",
+          ),
+        );
+    }
+
+    const isProvisional = resolveIsProvisional(IsProvisional, SaveDecision);
+
     const pool = await getPool();
 
     const { Mix = [] } = req.body;
@@ -198,10 +254,10 @@ export const saveEmissionFactor = asyncHandler(
 
     request.input("EF_Type", req.body.EF_Type);
 
-    request.input("EF_CO2", req.body.EF_CO2 ?? 0);
-    request.input("EF_CH4", req.body.EF_CH4 ?? 0);
-    request.input("EF_N2O", req.body.EF_N2O ?? 0);
-    request.input("EF_CO2e", req.body.EF_CO2e);
+    request.input("EF_CO2", req.body.EF_CO2 ?? null);
+    request.input("EF_CH4", req.body.EF_CH4 ?? null);
+    request.input("EF_N2O", req.body.EF_N2O ?? null);
+    request.input("EF_CO2e", req.body.EF_CO2e ?? null);
 
     request.input("EF_UnitID", req.body.EF_UnitID ?? null);
     request.input("CurrencyCode", req.body.CurrencyCode ?? null);
@@ -218,6 +274,7 @@ export const saveEmissionFactor = asyncHandler(
     request.input("ProcessID", req.body.ProcessID ?? null);
     request.input("IndustryID", req.body.IndustryID ?? null);
     request.input("ProductID", req.body.ProductID ?? null);
+    request.input("MaterialID", req.body.MaterialID ?? null);
 
     request.input("IsCompositeFactor", req.body.IsCompositeFactor ?? false);
 
@@ -228,7 +285,17 @@ export const saveEmissionFactor = asyncHandler(
 
     request.input("IsActive", req.body.IsActive ?? true);
     request.input("FactorKey", sql.VarChar(300), req.body.FactorKey ?? null);
-    request.input("RetainFactorKey", sql.Bit, req.body.RetainFactorKey ?? false);
+    request.input(
+      "RetainFactorKey",
+      sql.Bit,
+      req.body.RetainFactorKey ?? false,
+    );
+    request.input("IsProvisional", sql.Bit, isProvisional);
+    request.input(
+      "ResolutionNote",
+      sql.NVarChar(1000),
+      req.body.ResolutionNote ?? null,
+    );
 
     // TVP
     request.input("Mix", tvp);
