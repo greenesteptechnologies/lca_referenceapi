@@ -267,6 +267,27 @@ components:
     #       items:
     #         $ref: "#/components/schemas/EmissionFactorMix"
 
+    SaveEmissionFactorRequest:
+      type: object
+      properties:
+        IsProvisional:
+          type: boolean
+          nullable: true
+          description: When set, this value is sent to the stored procedure. If omitted or null and SaveDecision is also omitted, the procedure applies its lifecycle default.
+          example: false
+        SaveDecision:
+          type: string
+          enum:
+            - APPROVE
+            - PROVISIONAL
+          description: Maps to IsProvisional false for APPROVE and true for PROVISIONAL. Not sent directly to the stored procedure.
+        MaterialID:
+          type: integer
+          nullable: true
+        ResolutionNote:
+          type: string
+          nullable: true
+
     Scenario:
       type: object
       properties:
