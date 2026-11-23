@@ -19,6 +19,7 @@ import processMasterRoutes from "./routes/modules/process_master/process_master.
 import { swaggerServe, swaggerSetup } from "./config/swagger";
 import tempRoutes from "./routes/scenario_analysis/temp_routes";
 import { apiUsageLogMiddleware } from "./middlewares/apiUsageLog.middleware";
+import sourceSelectionRoutes from "./routes/modules/ef_factor/source_selection.routes";
 
 const app = express();
 
@@ -159,6 +160,9 @@ app.use("/api/v1/ef", efRoutes);
 
 // Process Master Routes
 app.use("/api/v1/process-master", processMasterRoutes);
+
+// EF Multisource selection routes
+app.use("/api/v1/implementation", sourceSelectionRoutes);
 
 //Temp Routes
 app.use("/api/v1/temp", tempRoutes);

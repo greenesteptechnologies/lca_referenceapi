@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import sql, { getPool } from "../config/db";
 import { logger } from "../config/logger";
 
-const serviceName = "LCA.Service.Api";
+const serviceName = "LCA.Reference.Api";
 
 async function persistApiUsage(
   req: Request,

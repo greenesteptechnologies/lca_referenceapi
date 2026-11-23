@@ -6,7 +6,7 @@ const swaggerSpec = swaggerJsdoc({
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "LCA Service API",
+      title: "LCA Reference API",
       version: "1.0.0",
     },
   },

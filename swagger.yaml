@@ -9,7 +9,7 @@ servers:
   - url: http://localhost:5001
     description: Local
 
-  - url: https://serviceapi.greenesteplca.com
+  - url: https://referenceapi.greenesteplca.com
     description: Production
 
 components:
@@ -18,6 +18,10 @@ components:
       type: apiKey
       in: header
       name: x-api-key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
 
   schemas:
 
@@ -100,6 +104,196 @@ components:
           type: boolean
           example: true
       description: For INSERT provide industryId, processCategoryId and processName. For UPDATE provide processId, industryId, processCategoryId and processName. For DELETE provide processId.
+
+    ActivityEFSourceCandidate:
+      type: object
+      properties:
+        factorId:
+          type: integer
+          format: int64
+          example: 227
+        categoryId:
+          type: integer
+          example: 18
+        factorName:
+          type: string
+          example: Industrial Machinery Purchase - Mass-based
+        factorKey:
+          type: string
+          example: TEXTILE_ACTIVITY_MATERIAL_CAP-MACHINERY-IND_KG_EF_AF31E90593
+        efType:
+          type: string
+          enum: [ACTIVITY, SPEND]
+        efCo2e:
+          type: number
+          nullable: true
+          example: 3
+        efUnitId:
+          type: integer
+          nullable: true
+        currencyCode:
+          type: string
+          nullable: true
+        scopeLevel:
+          type: string
+          enum: [TENANT, CITY, STATE, COUNTRY, REGION, GLOBAL]
+        tenantId:
+          type: string
+          nullable: true
+        sourceId:
+          type: integer
+          nullable: true
+        sourceName:
+          type: string
+          nullable: true
+        effectiveFrom:
+          type: string
+          format: date-time
+        effectiveTo:
+          type: string
+          format: date-time
+          nullable: true
+        versionNo:
+          type: integer
+        scopePriority:
+          type: integer
+        sourceRank:
+          type: integer
+          nullable: true
+        isHighestAvailableScope:
+          type: boolean
+        isResolverPreferredScope:
+          type: boolean
+        isResolverCandidate:
+          type: boolean
+        isResolverPreferred:
+          type: boolean
+        isResolverWinnerAvailable:
+          type: boolean
+        isExclusiveSource:
+          type: boolean
+        isCurrentlySelected:
+          type: boolean
+        currentSelectedFactorId:
+          type: integer
+          format: int64
+          nullable: true
+        currentSelectionIsManualOverride:
+          type: boolean
+        isUnresolved:
+          type: boolean
+        isProvisional:
+          type: boolean
+        isEnabledForCalculator:
+          type: boolean
+        resolutionNote:
+          type: string
+          nullable: true
+        lifecycleStatus:
+          type: string
+          enum: [CALCULATOR_READY, PROVISIONAL, UNRESOLVED]
+        requiresManualOverride:
+          type: boolean
+        companyExclusiveSourceCode:
+          type: string
+          nullable: true
+        companySourcePreferenceMode:
+          type: string
+          enum: [EXCLUSIVE_SOURCE, RANKING, NONE]
+        isRecommendedDefault:
+          type: boolean
+      additionalProperties: true
+
+    SaveCompanyActivityEFSourceSelectionRequest:
+      type: object
+      required:
+        - fiscalYearCode
+        - activityTypeId
+        - factorKey
+        - efType
+        - selectedFactorId
+        - isManualOverride
+        - overrideReason
+      properties:
+        fiscalYearCode:
+          type: string
+          maxLength: 20
+          example: 2025-26
+        activityTypeId:
+          type: integer
+          example: 1
+        factorKey:
+          type: string
+          maxLength: 300
+          example: TEXTILE_ACTIVITY_MATERIAL_CAP-MACHINERY-IND_KG_EF_AF31E90593
+        efType:
+          type: string
+          enum: [ACTIVITY, SPEND]
+          example: ACTIVITY
+        selectedFactorId:
+          type: integer
+          format: int64
+          nullable: true
+          example: 227
+          description: Use null only to clear a saved preference.
+        isManualOverride:
+          type: boolean
+          example: false
+        overrideReason:
+          type: string
+          maxLength: 500
+          nullable: true
+          example: null
+
+    SaveCompanyActivityEFSourceSelectionResponse:
+      type: object
+      required:
+        - selectionSaved
+        - selectedFactorId
+        - isManualOverride
+        - requiresManualOverride
+      properties:
+        selectionSaved:
+          type: boolean
+          example: true
+        selectedFactorId:
+          type: integer
+          format: int64
+          example: 227
+        isManualOverride:
+          type: boolean
+          example: false
+        requiresManualOverride:
+          type: boolean
+          example: false
+
+    ClearCompanyActivityEFSourceSelectionResponse:
+      type: object
+      required:
+        - selectionCleared
+      properties:
+        selectionCleared:
+          type: boolean
+          example: true
+
+    SourceSelectionErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+        code:
+          type: string
+          nullable: true
+        field:
+          type: string
+          nullable: true
+        data:
+          type: object
+          nullable: true
+          additionalProperties: true
 
     # SuccessResponse:
     #   type: object
@@ -767,6 +961,155 @@ paths:
 
         "400":
           description: Invalid factor
+
+  /api/v1/implementation/emission-factors/source-candidates:
+    get:
+      operationId: getActivityEFSourceCandidates
+      summary: Get applicable emission factor source candidates
+      description: Returns candidate factors for the authenticated company and the specified Wizard activity context.
+      tags:
+        - Multi-Source EF Selection
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      parameters:
+        - in: query
+          name: activityTypeId
+          required: true
+          schema:
+            type: integer
+          example: 1
+        - in: query
+          name: factorKey
+          required: true
+          schema:
+            type: string
+            maxLength: 300
+          example: TEXTILE_ACTIVITY_MATERIAL_CAP-MACHINERY-IND_KG_EF_AF31E90593
+        - in: query
+          name: efType
+          required: true
+          schema:
+            type: string
+            enum: [ACTIVITY, SPEND]
+          example: ACTIVITY
+        - in: query
+          name: fiscalYearCode
+          required: true
+          schema:
+            type: string
+            maxLength: 20
+          example: 2025-26
+      responses:
+        "200":
+          description: Candidate array. An empty array means no candidates are available.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityEFSourceCandidate"
+        "400":
+          description: Required query parameters are missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SourceSelectionErrorResponse"
+        "401":
+          description: Missing or invalid authentication context.
+        "404":
+          description: COMPANY_NOT_FOUND or ACTIVITY_TYPE_NOT_FOUND.
+        "403":
+          description: INVALID_USER_FOR_COMPANY.
+
+  /api/v1/implementation/emission-factors/source-selection:
+    post:
+      operationId: saveCompanyActivityEFSourceSelection
+      summary: Save a preferred emission factor
+      description: Saves a company-specific preference for the activity and fiscal year. It does not update the emission factor record or its lifecycle status.
+      tags:
+        - Multi-Source EF Selection
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveCompanyActivityEFSourceSelectionRequest"
+            examples:
+              preferredFactor:
+                summary: Save a preferred factor without override
+                value:
+                  fiscalYearCode: 2025-26
+                  activityTypeId: 1
+                  factorKey: TEXTILE_ACTIVITY_MATERIAL_CAP-MACHINERY-IND_KG_EF_AF31E90593
+                  efType: ACTIVITY
+                  selectedFactorId: 227
+                  isManualOverride: false
+                  overrideReason: null
+              manualOverride:
+                summary: Save a factor that requires manual override
+                value:
+                  fiscalYearCode: 2025-26
+                  activityTypeId: 1
+                  factorKey: TEXTILE_ACTIVITY_MATERIAL_CAP-MACHINERY-IND_KG_EF_AF31E90593
+                  efType: ACTIVITY
+                  selectedFactorId: 38
+                  isManualOverride: true
+                  overrideReason: Selected Global EF after implementation review.
+              clearPreference:
+                summary: Clear the saved preference
+                value:
+                  fiscalYearCode: 2025-26
+                  activityTypeId: 1
+                  factorKey: TEXTILE_ACTIVITY_MATERIAL_CAP-MACHINERY-IND_KG_EF_AF31E90593
+                  efType: ACTIVITY
+                  selectedFactorId: null
+                  isManualOverride: false
+                  overrideReason: null
+      responses:
+        "200":
+          description: Preference saved, or cleared when selectedFactorId is null.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/SaveCompanyActivityEFSourceSelectionResponse"
+                  - $ref: "#/components/schemas/ClearCompanyActivityEFSourceSelectionResponse"
+        "400":
+          description: Invalid request or override reason. Codes include INVALID_EF_TYPE, FACTOR_KEY_DOES_NOT_MATCH_ACTIVITY_PATH, and MANUAL_OVERRIDE_REASON_REQUIRED.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SourceSelectionErrorResponse"
+        "401":
+          description: Missing or invalid authentication context.
+        "403":
+          description: INVALID_USER_FOR_COMPANY.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SourceSelectionErrorResponse"
+        "404":
+          description: COMPANY_NOT_FOUND or ACTIVITY_TYPE_NOT_FOUND.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SourceSelectionErrorResponse"
+        "409":
+          description: Selected factor is not applicable, or a manual override is required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SourceSelectionErrorResponse"
+        "500":
+          description: Unexpected server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SourceSelectionErrorResponse"
 
   /api/v1/process-master/Process-category:
     get:
