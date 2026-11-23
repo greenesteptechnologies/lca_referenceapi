@@ -29,7 +29,7 @@ export const errorHandler = (
       safeMessage,
       {
         correlationId: req.correlationId,
-        originalUrl: req.originalUrl,
+        // originalUrl: req.originalUrl,
       },
       err.code,
       err.field ?? null,

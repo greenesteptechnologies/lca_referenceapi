@@ -7,7 +7,7 @@ export interface ApiAuditEntry {
   action: string;
   actionStatus: string;
   entityName: string;
-  entityKey: string | null;
+  entityKey: string;
   details: string;
   correlationId: string;
 }
