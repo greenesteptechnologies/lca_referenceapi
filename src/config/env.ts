@@ -22,4 +22,5 @@ export const ENV = {
   LOG_DIR: process.env.LOG_DIR || "",
   LOG_MAX_DAYS: process.env.LOG_MAX_DAYS || "",
   LOG_TO_CONSOLE: process.env.LOG_TO_CONSOLE || "",
+  JWT_SECRET: process.env.JWT_SECRET,
 };

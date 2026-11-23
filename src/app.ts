@@ -8,6 +8,9 @@ import { logger } from "./config/logger";
 
 import { requestMiddleware } from "./middlewares/request.middleware";
 import { errorHandler } from "./middlewares/error.middleware";
+import { validateApiKey } from "./middlewares/apiKey.middleware";
+import { globalRateLimiter } from "./middlewares/rateLimit.middleware";
+import { auditLogMiddleware } from "./middlewares/auditLog.middleware";
 
 import testRoutes from "./routes/test.routes";
 import efRoutes from "./routes/modules/ef_factor/ef.routes";
@@ -15,6 +18,7 @@ import processMasterRoutes from "./routes/modules/process_master/process_master.
 
 import { swaggerServe, swaggerSetup } from "./config/swagger";
 import tempRoutes from "./routes/scenario_analysis/temp_routes";
+import { apiUsageLogMiddleware } from "./middlewares/apiUsageLog.middleware";
 
 const app = express();
 
@@ -22,19 +26,20 @@ const app = express();
 app.use(helmet());
 
 // REQUEST PARSER
-app.use(express.json());
+app.use(express.json({ limit: "20kb" }));
 
 // REQUEST CONTEXT / CORRELATION ID
 app.use(requestMiddleware);
 
 // CORS CONFIGURATION
+const normalizeOrigin = (value: string) =>
+  value.trim().toLowerCase().replace(/\/+$/, "");
+
 const allowedOrigins = (ENV.ALLOWED_ORIGINS || "")
   .split(",")
-  .map((origin) => origin.trim())
+  .map(normalizeOrigin)
   .filter(Boolean);
-
-// For dev/testing only — do not enable in production
-// const allowAllOrigins = allowedOrigins.includes("*");
+const allowAllOrigins = allowedOrigins.includes("*");
 
 app.use(
   cors({
@@ -44,7 +49,7 @@ app.use(
         return callback(null, true);
       }
 
-      if ( /* allowAllOrigins || */ allowedOrigins.includes(origin)) {
+      if (allowAllOrigins || allowedOrigins.includes(normalizeOrigin(origin))) {
         return callback(null, true);
       }
 
@@ -58,18 +63,21 @@ app.use(
 
     credentials: true,
 
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 
     allowedHeaders: [
       "Content-Type",
       "Authorization",
-      "x-api-key",
+      "x-api-key",  //later should  be removed
       "x-correlation-id",
     ],
 
     optionsSuccessStatus: 200,
   }),
 );
+
+// Apply a baseline request limit before authentication and route handling.
+app.use(globalRateLimiter);
 
 // REQUEST LOGGING
 morgan.token("correlation-id", (req: any) => req.correlationId);
@@ -120,6 +128,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
+app.use(auditLogMiddleware);
+app.use(apiUsageLogMiddleware);
 
 // SWAGGER
 app.use("/swagger", swaggerServe, swaggerSetup);
