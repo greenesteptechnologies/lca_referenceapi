@@ -26,14 +26,24 @@ let poolPromise2: Promise<sql.ConnectionPool> | null = null;
 
 export const getPool = () => {
   if (!poolPromise) {
-    poolPromise = new sql.ConnectionPool(dbConfig).connect();
+    poolPromise = new sql.ConnectionPool(dbConfig)
+      .connect()
+      .catch((error) => {
+        poolPromise = null;
+        throw error;
+      });
   }
   return poolPromise;
 };
 
 export const getPool2 = () => {
   if (!poolPromise2) {
-    poolPromise2 = new sql.ConnectionPool(dbConfig2).connect();
+    poolPromise2 = new sql.ConnectionPool(dbConfig2)
+      .connect()
+      .catch((error) => {
+        poolPromise2 = null;
+        throw error;
+      });
   }
   return poolPromise2;
 };
