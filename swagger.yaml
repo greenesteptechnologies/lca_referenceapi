@@ -773,6 +773,7 @@ components:
 
 security:
   - ApiKeyAuth: []
+    BearerAuth: []
 
 paths:
 
@@ -794,6 +795,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       responses:
         "200":
@@ -807,6 +809,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       responses:
         "200":
@@ -820,6 +823,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       responses:
         "200":
@@ -833,6 +837,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
 
@@ -888,6 +893,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
 
@@ -921,6 +927,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       requestBody:
         required: true
@@ -945,6 +952,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
 
@@ -1119,6 +1127,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
 
@@ -1155,6 +1164,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       requestBody:
         required: true
@@ -1178,6 +1188,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
 
@@ -1218,6 +1229,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       requestBody:
         required: true
@@ -1241,6 +1253,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
         - in: path
@@ -1273,6 +1286,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
         - in: query
@@ -1303,6 +1317,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
         - in: query
@@ -1349,6 +1364,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
         - in: query
@@ -1394,6 +1410,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
         - in: query
@@ -1448,6 +1465,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
         - in: query
@@ -1504,6 +1522,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
         - in: path
@@ -1543,6 +1562,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
         - in: query
@@ -1623,6 +1643,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
         - in: query
@@ -1713,6 +1734,7 @@ paths:
 
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
 
       parameters:
 
@@ -1751,6 +1773,7 @@ paths:
         - Scenario Analysis
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
       parameters:
         - in: path
           name: scenarioId
@@ -1787,6 +1810,7 @@ paths:
         - Scenario Analysis
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
       parameters:
         - in: path
           name: scenarioId
@@ -1819,6 +1843,7 @@ paths:
         - Scenario Analysis
       security:
         - ApiKeyAuth: []
+          BearerAuth: []
       parameters:
         - in: path
           name: scenarioId
