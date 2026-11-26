@@ -9,7 +9,7 @@ import { verifyJWT } from "../../../middlewares/jwt.middleware";
 
 const router = Router();
 
-// router.use(verifyJWT);
+router.use(verifyJWT);
 
 router.get("/reference", getEmissionFactorReferenceData);
 
